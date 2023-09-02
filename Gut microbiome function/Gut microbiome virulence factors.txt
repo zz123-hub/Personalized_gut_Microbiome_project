@@ -1,0 +1,34 @@
+#For Gut microbiome virulence factors
+
+software: software:MetaGeneMark, perl, cd-hit-est, bowtie2, samtools
+
+Parameter:
+
+megahit --12 C1.fq -o ./C1_out
+
+sed 's/k141/con1/g' C1.contigs.fa > C1.fa
+
+/MetaGeneMark_linux_64/mgm/gmhmmp -a -d -f G -m /MetaGeneMark_v1.mod C1.fA -o C1.gff
+
+perl /MetaGeneMark_linux_64/mgm/nt_from_gff.pl C1.gff > C1.nt.fasta
+
+sed 's/gene_id/con1/g' C1.nt.fasta > C1.nt.fa
+
+cat *.nt.fa > all_gene_DNA.fa
+
+cd-hit-est -i all_gene_DNA.fa -o all_gene_clean.fa -c 0.95 -n 10 -M 32000 -aS 0.9 -T 8 -B 1
+
+
+#Eliminating redundancy for abundance calculation
+bowtie2-build  all_gene_clean.fa  all_gene_clean.index
+bowtie2 -p 6 -x  all_gene_clean.index -f -U C1.fq -S C1.sam
+samtools view -bS C1.sam -o C1.bam
+samtools sort -m 10000000000 C1.bam -o C1.out.bam
+samtools index C1.out.bam
+samtools idxstats C1.out.bam | tee -a C1.txt
+
+#Annotation
+diamond makedb --in VFDB_setA_pro.fas --db vfdb_pro
+
+diamond blastx --db vfdb_pro.dmnd --query all_gene_DNA.fa --out vfs.txt --outfmt 6 --evalue 1e-5 &
+
