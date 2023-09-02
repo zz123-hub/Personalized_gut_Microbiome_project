@@ -1,0 +1,18 @@
+#Reference genome coalescence
+
+cat *.fasta > ref.fa
+
+prodigal -i ref.fa -d ref_genes.fna
+
+bowtie2-build ref.fa ref.index
+
+bowtie2 -p 42 -x ref.index --no-mixed --very-sensitive --n-ceil 0,0.01 -U test.fq -S sequence.sam
+
+samtools view -bS sequence.sam -o sequence.bam
+
+samtools sort -m 10000000000 sequence.bam sequence.sorted.bam
+
+#for SNVs
+
+inStrain profile sequence.sorted.bam.bam ref.fa -o sequence.profile -p 45 -g ref_genes.fna
+
