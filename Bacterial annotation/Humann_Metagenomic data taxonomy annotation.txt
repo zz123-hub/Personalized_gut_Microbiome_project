@@ -1,0 +1,21 @@
+#For Humann_Metagenomic data taxonomy annotation
+
+software:humann3.7&Metaphlan4
+
+Parameter:
+
+fq2fa --merge --filter C1_1.fq C1_2.fq C1.fa
+
+humann --threads 42 --input C1.fa --output humann/
+
+ls *pathabundance.tsv | /opt/anaconda3/bin/parallel -j 10 humann_renorm_table --input {} --output  {.}_relab.tsv --units relab
+
+humann_join_tables --input $PWD --output ./merge_result/humann_pathabundance_relab.tsv --file_name pathabundance_relab
+
+humann_join_tables --input $PWD --output ./merge_result/humann_pathabundance_hits.tsv --file_name pathabundance.tsv
+
+merge_metaphlan_tables.py *metaphlan_bugs_list.tsv > merged_metaphlan.txt
+
+humann_split_stratified_table --input humann2_pathabundance_relab.tsv --output ./
+
+humann_split_stratified_table --input humann2_pathabundance_hits.tsv --output ./

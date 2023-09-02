@@ -1,0 +1,11 @@
+#For Kraken2_Metagenomic data taxonomy annotation
+
+software: kraken2&bracken
+
+Parameter:
+
+kraken2 --db /database/Bracken --threads 6 --report C1.kreport C1.fa > C1.kraken
+
+bracken -d /database/Bracken -i C1.kreport -o C1.bracken -r 150 -t 8
+
+/opt/anaconda3/bin/combine_bracken_outputs.py --files C1.bracken C2.bracken --names C1,C2 -o all.txt
