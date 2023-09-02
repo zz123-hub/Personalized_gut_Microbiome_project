@@ -1,0 +1,15 @@
+#For Fungi_Metagenomic data taxonomy annotation
+
+software:bowtie2&samtools
+
+Parameter:
+
+bowtie2 -p 20 -x /database/Eukdetect/ncbi_eukprot_met_arch_markers.fna -f -U C1.fa -S C1.sam
+
+samtools view -bS C1.sam -o C1.bam
+
+samtools sort -m 10000000000 C1.bam -o C1.out.bam
+
+samtools index C1.out.bam
+
+samtools idxstats C1.out.bam | tee -a C1_fungi.txt
