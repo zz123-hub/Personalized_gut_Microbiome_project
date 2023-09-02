@@ -1,0 +1,11 @@
+otu <- read.delim('111.txt', row.names = 1, sep = '\t', stringsAsFactors = FALSE, check.names = FALSE)
+otu <- t(otu)
+library(lattice)
+library(permute)
+library(vegan)
+richness <- rowSums(otu > 0)
+shannon_index <- diversity(otu, index = 'shannon', base = exp(1))
+gini_simpson_index <- diversity(otu, index = 'simpson')
+write.csv(shannon_index,  'shannon.csv', quote = FALSE)
+write.csv(gini_simpson_index, 'simpon.csv', quote = FALSE)
+
